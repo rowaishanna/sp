@@ -1,1 +1,1 @@
-web: gunicorn "SP:create_app()"
+web: gunicorn app.py
