@@ -19,6 +19,7 @@ sp.trace = True
 APP = Flask(__name__)
 migrate = Migrate()
 APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///spotify_songs.db'
+APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(APP)
 db.init_app(APP)
 migrate.init_app(APP, db)
