@@ -56,8 +56,11 @@ def create_app():
     def get_suggestions():
         print('GETTING SPOTIFY TRACK INFO...')
         print('USER QUERY:', dict(request.form))
-
-        search_str = (request.form['artist_name']+" "+request.form['song_name'])
+        artist_name= request.form['artist_name']
+        song_name= request.form['song_name']
+        if artist_name=='' or song_name=='':
+            return render_template('user_query.html', message='please enter your song and artist')
+        search_str = (artist_name+" "+song_name)
         result = sp.search(q=search_str, type='track', limit=1)
         print (search_str)
         #pprint(result)

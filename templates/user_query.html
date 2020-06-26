@@ -5,7 +5,9 @@
     <h2>Want a List of Songs to listen to on Spotify?</h2>
 
     <p>Use the form below to get some song suggestions!</p>
-
+        {% if message %}
+        <p class="message"> {{message | safe}} </p>
+        {% endif %}
     <form action="/suggestions" method="POST">
         <br>
         <br>
