@@ -1,1 +1,1 @@
-web: gunicorn "app:APP.run()"
+web: gunicorn "app:APP"
