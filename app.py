@@ -72,7 +72,37 @@ def get_suggestions():
     pprint(recommended_tracks)  
     top7_recos = [t['name']for t in recommended_tracks] # a list of top 7 recommended track names
     return render_template("suggestions.html", recommended_songs=top7_recos)
+"""
+ the following code can be used to return a json list of songs instead
+ """
+ """
+@APP.route('/suggest', methods=['POST']) #returns json list of recos
 
+def get_track_suggestions():
+    artist_name= request.form['artist_name']
+    song_name= request.form['song_name']
+    if artist_name=='' or song_name=='':
+        return render_template('user_query.html', message='please enter your song and artist')
+    search_str = (artist_name+" "+song_name)
+    result = sp.search(q=search_str, type='track', limit=1)
+    print (search_str)
+    recommendations = sp.recommendations(limit=7, seed_tracks = [track_id])
+    print (type(track_id))
+    print (track_id)
+    pprint (recommendations['tracks'])
+    recommended_tracks = recommendations['tracks']
+    #TOP_recommended_track_name = recommended_tracks[0]['name'] #returns top result track name
+    top7_recos = [t['name']for t in recommended_tracks] # a list of top 7 recommended track names
+    pprint (top7_recos)
+    #to get a dictionary result:
+    keys=['recommendation 1:', 'recommendation 2:', 'recommendation 3:', 'recommendation 4:', 'recommendation 5:', 'recommendation 6:', 'recommendation 7:']
+    dict_top7=dict(zip(keys, top7_recos))
+    print(dict_top7)
+    # to retun json:
+    top7_recos_json = json.dumps(dict_top7)
+    print(top7_recos_json)
+    return top7_recos_json
+"""
 
 if __name__ =='__main__':
     APP.run()
@@ -125,25 +155,5 @@ def get_track_features():
     print("________________")
     db.session.commit()
     return "User Track added to DB"
-
-@APP.route('/suggest') #returns json list of recos
-
-def get_track_suggestions():
-    recommendations = sp.recommendations(limit=7, seed_tracks = [track_id])
-    print (type(track_id))
-    print (track_id)
-    pprint (recommendations['tracks'])
-    recommended_tracks = recommendations['tracks']
-    #TOP_recommended_track_name = recommended_tracks[0]['name'] #returns top result track name
-    top7_recos = [t['name']for t in recommended_tracks] # a list of top 7 recommended track names
-    pprint (top7_recos)
-    #to get a dictionary result:
-    keys=['recommendation 1:', 'recommendation 2:', 'recommendation 3:', 'recommendation 4:', 'recommendation 5:', 'recommendation 6:', 'recommendation 7:']
-    dict_top7=dict(zip(keys, top7_recos))
-    print(dict_top7)
-    # to retun json:
-    top7_recos_json = json.dumps(dict_top7)
-    print(top7_recos_json)
-    return top7_recos_json
 #################################################################################
 """
