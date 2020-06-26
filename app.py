@@ -22,6 +22,7 @@ APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///spotify_songs.db'
 db = SQLAlchemy(APP)
 db.init_app(APP)
 migrate.init_app(APP, db)
+
 class Track(db.Model):
     id = db.Column(db.String, primary_key=True)
     danceability = db.Column(db.Float)
@@ -40,43 +41,37 @@ class Track(db.Model):
     duration_ms = db.Column(db.Integer)
     time_signature = db.Column(db.Float)
 
-def create_app():
-    APP = Flask(__name__)
-    migrate = Migrate()
-    APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///spotify_songs.db'
-    db = SQLAlchemy(APP)
-    db.init_app(APP)
-    migrate.init_app(APP, db)
 
-    @APP.route('/')
-    def user_query():
-        return render_template('user_query.html')
 
-    @APP.route('/suggestions', methods=['POST']) #returns html page with recos
-    def get_suggestions():
-        print('GETTING SPOTIFY TRACK INFO...')
-        print('USER QUERY:', dict(request.form))
-        artist_name= request.form['artist_name']
-        song_name= request.form['song_name']
-        if artist_name=='' or song_name=='':
-            return render_template('user_query.html', message='please enter your song and artist')
-        search_str = (artist_name+" "+song_name)
-        result = sp.search(q=search_str, type='track', limit=1)
-        print (search_str)
-        #pprint(result)
-        #print(type(result)) ->dict
-        
-        track_id = result['tracks']['items'][0]['id']
-        #print(type(track_id)) ->string
-        pprint(track_id)
-        print("-----------------")
-        print("GETTING RECOMMENDATIONS...")
-        recommendations = sp.recommendations(limit=7, seed_tracks = [track_id])
-        recommended_tracks = recommendations['tracks']
-        pprint(recommended_tracks)  
-        top7_recos = [t['name']for t in recommended_tracks] # a list of top 7 recommended track names
-        return render_template("suggestions.html", recommended_songs=top7_recos)
-    return APP
+@APP.route('/')
+def user_query():
+    return render_template('user_query.html')
+
+@APP.route('/suggestions', methods=['POST']) #returns html page with recos
+def get_suggestions():
+    print('GETTING SPOTIFY TRACK INFO...')
+    print('USER QUERY:', dict(request.form))
+    artist_name= request.form['artist_name']
+    song_name= request.form['song_name']
+    if artist_name=='' or song_name=='':
+        return render_template('user_query.html', message='please enter your song and artist')
+    search_str = (artist_name+" "+song_name)
+    result = sp.search(q=search_str, type='track', limit=1)
+    print (search_str)
+    #pprint(result)
+    #print(type(result)) ->dict
+    
+    track_id = result['tracks']['items'][0]['id']
+    #print(type(track_id)) ->string
+    pprint(track_id)
+    print("-----------------")
+    print("GETTING RECOMMENDATIONS...")
+    recommendations = sp.recommendations(limit=7, seed_tracks = [track_id])
+    recommended_tracks = recommendations['tracks']
+    pprint(recommended_tracks)  
+    top7_recos = [t['name']for t in recommended_tracks] # a list of top 7 recommended track names
+    return render_template("suggestions.html", recommended_songs=top7_recos)
+
 
 if __name__ =='__main__':
     APP.debug = True
